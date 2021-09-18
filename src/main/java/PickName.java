@@ -22,7 +22,7 @@ public class PickName {
         NameOperator nameOperator = new NameOperator();
         nameOperator.nameList = nameList;
         nameOperator.excludeNumbers.add(1);
-        nameOperator.excludeNumbers.add(2);
+        nameOperator.excludeNumbers.add(9);
 
         nameOperator.getNameExceptNumber();
         List<String> result = nameOperator.combineNameFromString(2);
@@ -36,27 +36,5 @@ public class PickName {
             System.out.println("NO NAME FULL NUMBERS\n");
             nameOperator.printResult();
         }
-
-
-//        String nameFiltered = getNameExceptNumber(nameList, 1, 2);
-//        String nameCombined = combineNameFromString(nameFiltered);
-//        List<String> nameCombinedList = Arrays.stream(nameCombined.split(",")).collect(Collectors.toList());
-//        List<String> nameCombinedAndFiltered = getCombinedNameNotDuplicatedNumber(nameCombinedList.stream().distinct().sorted().collect(Collectors.toList()), 1, 2);
-//        if (nameCombinedAndFiltered.size() > 0) {
-//            nameCombinedAndFiltered = nameCombinedAndFiltered.stream().filter(name -> !name.isEmpty()).collect(Collectors.toList());
-//            nameCombinedAndFiltered = nameCombinedAndFiltered.stream().filter(name -> !name.isBlank()).collect(Collectors.toList());
-//            Map<Long, String> result = new HashMap<>();
-//            Map<Long, String> temp = new HashMap<>();
-//            for (int i = 0; i < nameCombinedAndFiltered.size() - 1; i++) {
-//                temp = NumAndChar.getStringNumberOfName(nameCombinedAndFiltered.get(i));
-//                for (Map.Entry<Long, String> item : temp.entrySet()) {
-//                    result.put(item.getKey(), item.getValue());
-//                }
-//            }
-//            result.entrySet().stream()
-//                    .sorted(Map.Entry.comparingByKey()).forEach(System.out::println);
-//        }
-//    }
-
     }
 }
