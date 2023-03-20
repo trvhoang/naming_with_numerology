@@ -1,4 +1,5 @@
 # naming_with_numerology
+getFileContent() -> dùng file name/nickname để lấy input data
 
 nameOperator.excludeNumbers.add(1); -> con số cần exclude ra khỏi tên
 
