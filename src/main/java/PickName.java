@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 
 public class PickName {
     private static String getFileContent() throws IOException {
-        String file = "name.txt";
+//        String file = "name.txt";
+        String file = "nickname.txt";
         var path = Paths.get("src/main/resources/", file);
         String content = new String(Files.readAllBytes(path));
         return content;
@@ -22,10 +23,11 @@ public class PickName {
         NameOperator nameOperator = new NameOperator();
         nameOperator.nameList = nameList;
         nameOperator.excludeNumbers.add(1);
-        nameOperator.excludeNumbers.add(9);
+        nameOperator.excludeNumbers.add(2);
+        nameOperator.excludeNumbers.add(3);
 
         nameOperator.getNameExceptNumber();
-        List<String> result = nameOperator.combineNameFromString(2);
+        List<String> result = nameOperator.combineNameFromString(3);
         result = result.stream().sorted().collect(Collectors.toList());
         if (result.size() == 0) System.out.println("NO SUITABLE NAME, FILTER BY SELF \n" + result);
         if ((result.size() > 0) && nameOperator.checkContainAllNumberExcept()) {

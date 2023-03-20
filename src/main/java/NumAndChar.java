@@ -36,9 +36,9 @@ public enum NumAndChar {
     }
 
     public static Integer getNumberOfChar(String input) {
-        input.replace(" ","");
+        input.replace(" ","").trim();
         try{
-            return NumAndChar.valueOf(input.trim()).number;
+            return NumAndChar.valueOf(input.trim().toUpperCase()).number;
         } catch (Exception e) {
             return null;
         }

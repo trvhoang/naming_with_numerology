@@ -5,18 +5,21 @@ public class NameOperator {
     public List<String> nameList;
     public List<Integer> excludeNumbers;
     public List<String> resultList;
+    public List<String> resultFullNumberList;
+    Boolean flag = true;
 
     NameOperator() {
         this.nameList = new ArrayList<>();
         this.excludeNumbers = new ArrayList<>();
         this.resultList = new ArrayList<>();
+        this.resultFullNumberList = new ArrayList<>();
     }
 
     public Boolean doesContainsExcludedNumber(String input, List<Integer> filters) {
         boolean flag = false;
         Map<Long, String> map = NumAndChar.getStringNumberOfName(input);
         String stringNum = map.entrySet().iterator().next().getKey().toString();
-        for (int i = 0; i < filters.size() - 1; i++) {
+        for (int i = 0; i < filters.size(); i++) {
             if (stringNum.contains(filters.get(i).toString())) flag = true;
         }
         return flag;
@@ -24,9 +27,9 @@ public class NameOperator {
 
     public String getNameExceptNumber() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < this.nameList.size() - 1; i++) {
-            if (!doesContainsExcludedNumber(nameList.get(i), excludeNumbers)) {
-                stringBuilder.append(nameList.get(i) + ",");
+        for (int i = 0; i < this.nameList.size(); i++) {
+            if (!doesContainsExcludedNumber(this.nameList.get(i), this.excludeNumbers)) {
+                stringBuilder.append(this.nameList.get(i) + ",");
             }
         }
         if (stringBuilder.length() == 0) throw new RuntimeException("getNameExceptNumber No name suitable");
@@ -37,14 +40,11 @@ public class NameOperator {
     public List<String> combineNameFromString(Integer duplicateNum) {
         String[] combineArray = getNameExceptNumber().split(",");
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < combineArray.length - 1; i++) {
-            for (int y = 0; y < combineArray.length - 1; y++) {
-                if (i != y) {
-                    String input = combineArray[i] + combineArray[y];
-                    if (checkDuplication(input, duplicateNum)) {
-                        result.append(combineArray[i] + " " + combineArray[y] + ", ");
-                    }
-
+        for (int i = 0; i < combineArray.length; i++) {
+            for (int y = 0; y < combineArray.length; y++) {
+                String input = combineArray[i] + combineArray[y];
+                if (checkDuplicationSatisfied(input, duplicateNum)) {
+                    result.append(combineArray[i] + " " + combineArray[y] + ", ");
                 }
             }
         }
@@ -52,23 +52,23 @@ public class NameOperator {
         return this.resultList;
     }
 
-    public Boolean checkDuplication(String input, Integer duplicateNum) {
+    public Boolean checkDuplicationSatisfied(String input, Integer duplicateNum) {
         Map<Long, String> map = NumAndChar.getStringNumberOfName(input);
         String stringNum = map.entrySet().iterator().next().getKey().toString();
         List<String> numList = Arrays.stream(stringNum.split("")).collect(Collectors.toList());
         int count = 0;
-        for (int i = 0; i < numList.size() - 1; i++) {
-            count = 0;
-            for (int y = 0; y < numList.size() - 1; y++) {
+        boolean flag = true;
+        for (int i = 0; i < numList.size(); i++) {
+            for (int y = 0; y < numList.size(); y++) {
                 String string1 = numList.get(i);
                 String string2 = numList.get(y);
-                if ((i != y) && (string1.equals(string2))) {
+                if ((i != y) && (string1.equalsIgnoreCase(string2))) {
                     count++;
                 }
             }
-            if (count > duplicateNum) return false;
+            if (count > duplicateNum) flag = false;
         }
-        return true;
+        return flag;
     }
 
     public Boolean checkContainAllNumberExcept() {
@@ -76,7 +76,7 @@ public class NameOperator {
         input.removeAll(Arrays.asList(" ", "", ",", null));
         input = input.stream().filter(item -> !item.isEmpty()).collect(Collectors.toList());
         input = input.stream().filter(item -> !item.isBlank()).collect(Collectors.toList());
-        boolean flag = true;
+//        boolean flag = true;
         if (input.size() == 0) {
             System.out.println("NO INPUT TO CHECK NAME FULL NUMBER");
             return false;
@@ -84,7 +84,6 @@ public class NameOperator {
         List<Integer> list = new ArrayList<>();
         for (String chars : input) {
             try {
-                Integer abc = NumAndChar.getNumberOfChar(chars);
                 list.add(NumAndChar.getNumberOfChar(chars));
             } catch (Exception e) {
                 System.out.println("VALIDATOR ERROR " + chars);
@@ -92,29 +91,52 @@ public class NameOperator {
         }
         Integer[] allNum = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
         List<Integer> allNumList = Arrays.stream(allNum).collect(Collectors.toList());
+        allNumList.removeAll(excludeNumbers);
         list.stream().sorted();
         for (Integer number : this.excludeNumbers) {
             allNumList.remove(number);
         }
-        for (Integer number : allNumList) {
-            String numberString = number.toString();
-            for (String string : this.resultList) {
+//        for (Integer number : allNumList) {
+//            String numberString = number.toString();
+        for (String string : this.resultList) {
+            this.flag = true;
+            allNumList.forEach(number -> {
+                String numberString = number.toString();
                 Map<Long, String> map = NumAndChar.getStringNumberOfName(string);
                 String mapString = map.entrySet().iterator().next().getKey().toString();
-                if (mapString.contains(numberString)) flag = false;
-            }
+                if (!mapString.contains(numberString)) {
+                    this.flag = false;
+                }
+            });
+            if (this.flag) this.resultFullNumberList.add(string);
         }
-        return flag;
+        return this.resultFullNumberList.size() == 0;
     }
 
     public void printResult() {
-        List<String> result = this.resultList;
-        Map<String, Long> mapResult = new HashMap<>();
-        for (int i = 0; i < result.size() - 1; i++) {
-            Long temp = NumAndChar.getNumberOfName(result.get(i));
-            mapResult.put(result.get(i), temp);
+        if (this.resultFullNumberList.size() > 0) {
+            List<String> result = this.resultFullNumberList;
+            Map<String, Long> mapResult = new HashMap<>();
+            for (int i = 0; i < result.size(); i++) {
+                Long temp = NumAndChar.getNumberOfName(result.get(i));
+                mapResult.put(result.get(i), temp);
+            }
+            mapResult.entrySet().removeIf(item -> item.getValue() < 99999);
+            System.out.println("FULL NAME LIST");
+            mapResult.entrySet().stream().distinct()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEach(System.out::println);
+            System.out.println("-----------------------");
         }
-        mapResult.entrySet().stream().distinct()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEach(System.out::println);
+        if (this.resultFullNumberList.size() == 0) {
+            List<String> result = this.resultList;
+            Map<String, Long> mapResult = new HashMap<>();
+            for (int i = 0; i < result.size(); i++) {
+                Long temp = NumAndChar.getNumberOfName(result.get(i));
+                mapResult.put(result.get(i), temp);
+            }
+            mapResult.entrySet().removeIf(item -> item.getValue() < 99999);
+            mapResult.entrySet().stream().distinct()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEach(System.out::println);
+        }
     }
 }
